@@ -1,4 +1,4 @@
-package uk.co.studio.neo.popularmovies.model;
+package uk.co.studio.neo.popularmovies.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -52,4 +52,52 @@ public class Movie implements Parcelable{
         mMovieReleaseDate = in.readString();
     }
 
+    public Movie(){
+
+    }
+
+    public String getMovieTitle() {
+        return mMovieTitle;
+    }
+
+    public String getMoviePosterCompleteURL() {
+
+        String size = "w185";
+
+        String completePosterPath = BASE_URL + size + mMoviePosterPath;
+
+        return completePosterPath;
+    }
+
+    public String getMovieSynopsis() {
+        return mMovieSynopsis;
+    }
+
+    public String getMovieRating() {
+        return mMovieRating;
+    }
+
+    public String getmMovieReleaseDate() {
+        return mMovieReleaseDate;
+    }
+
+    public void setMovieTitle(String mMovieTitle) {
+        this.mMovieTitle = mMovieTitle;
+    }
+
+    public void setMoviePosterPath(String mMoviePosterPath) {
+        this.mMoviePosterPath = mMoviePosterPath;
+    }
+
+    public void setMovieSynopsis(String mMovieSynopsis) {
+        this.mMovieSynopsis = mMovieSynopsis;
+    }
+
+    public void setMovieRating(String mMovieRating) {
+        this.mMovieRating = mMovieRating;
+    }
+
+    public void setMovieReleaseDate(String mMovieReleaseDate) {
+        this.mMovieReleaseDate = mMovieReleaseDate;
+    }
 }

@@ -11,8 +11,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import uk.co.studio.neo.popularmovies.model.Model;
-import uk.co.studio.neo.popularmovies.model.MovieVO;
+import uk.co.studio.neo.popularmovies.data.Movie;
 
 
 /**
@@ -30,9 +29,8 @@ public class DetailActivityFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
         Intent intent = getActivity().getIntent();
-        int position = intent.getIntExtra(PostersFragment.EXTRA_MESSAGE, 0);
-
-        MovieVO movie = Model.getMovieAtPosition(position);
+        Bundle bundle = intent.getExtras();
+        Movie movie = bundle.getParcelable(PostersFragment.EXTRA_OBJECT);
 
         TextView movieTitle = (TextView)rootView.findViewById(R.id.movie_title);
         movieTitle.setText(movie.getMovieTitle());

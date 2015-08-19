@@ -10,14 +10,16 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import uk.co.studio.neo.popularmovies.data.Movie;
+
 /**
  * Created by Sonia Rakotomanantsoa on 03/08/15.
  */
-public class PosterAdapter extends ArrayAdapter<String>{
+public class PosterAdapter extends ArrayAdapter<Movie>{
 
     Context context;
 
-    public PosterAdapter(Context context, int resource, List<String> objects) {
+    public PosterAdapter(Context context, int resource, List<Movie> objects) {
         super(context, resource ,objects);
         this.context = context;
     }
@@ -35,7 +37,7 @@ public class PosterAdapter extends ArrayAdapter<String>{
             holder = (ViewHolder) view.getTag();
         }
 
-        String url = getItem(position);
+        String url = getItem(position).getMoviePosterCompleteURL();
 
         Picasso.with(context)
                 .load(url)

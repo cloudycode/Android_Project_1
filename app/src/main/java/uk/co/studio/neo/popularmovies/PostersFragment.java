@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
 import org.json.JSONArray;
@@ -27,8 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-import uk.co.studio.neo.popularmovies.model.Model;
-import uk.co.studio.neo.popularmovies.model.MovieVO;
+import uk.co.studio.neo.popularmovies.data.Movie;
 
 
 /**
@@ -36,9 +34,9 @@ import uk.co.studio.neo.popularmovies.model.MovieVO;
  */
 public class PostersFragment extends Fragment {
 
-    public final static String EXTRA_MESSAGE = "co.uk.studio.neo.popularmovies.MESSAGE";
+    public final static String EXTRA_OBJECT = "uk.co.studio.neo.popularmovies.data.Movie";
 
-    private ArrayAdapter<String> mPosterAdapter;
+    private PosterAdapter mPosterAdapter;
 
     public PostersFragment() {
     }
@@ -52,7 +50,7 @@ public class PostersFragment extends Fragment {
         mPosterAdapter = new PosterAdapter(
                 getActivity(),
                 R.layout.grid_item_poster,
-                new ArrayList<String>());
+                new ArrayList<Movie>());
 
         GridView gridview = (GridView) rootView.findViewById(R.id.gridview_posters);
         gridview.setAdapter(mPosterAdapter);
@@ -61,7 +59,7 @@ public class PostersFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 Intent intent = new Intent(getActivity(), DetailActivity.class)
-                        .putExtra(EXTRA_MESSAGE, position);
+                        .putExtra(EXTRA_OBJECT, mPosterAdapter.getItem(position));
                 startActivity(intent);
             }
         });
@@ -85,20 +83,21 @@ public class PostersFragment extends Fragment {
         super.onStart();
     }
 
-    public class FetchMoviesTask extends AsyncTask<String, Void, MovieVO[]> {
+    public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<Movie>> {
 
         private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
 
         @Override
-        protected void onPostExecute(MovieVO[] results) {
+        protected void onPostExecute(ArrayList<Movie> results) {
             mPosterAdapter.clear();
-            for (MovieVO movieVO : results){
-                mPosterAdapter.add(movieVO.getMoviePosterCompleteURL());
+            for (Movie aMovie:results) {
+                mPosterAdapter.add(aMovie);
             }
+            mPosterAdapter.notifyDataSetChanged();
         }
 
         @Override
-        protected MovieVO[] doInBackground(String... params) {
+        protected ArrayList<Movie> doInBackground(String... params) {
 
             if (params.length == 0) {
                 return null;
@@ -186,7 +185,7 @@ public class PostersFragment extends Fragment {
          * Take the String representing the complete movies list in JSON Format and
          * pull out the data we need to construct the Strings needed for the mockups.
          */
-        private MovieVO[] getMoviesDataFromJson(String moviesJsonStr)
+        private ArrayList<Movie> getMoviesDataFromJson(String moviesJsonStr)
                 throws JSONException {
 
             // These are the names of the JSON objects that need to be extracted.
@@ -200,9 +199,8 @@ public class PostersFragment extends Fragment {
             JSONObject moviesJson = new JSONObject(moviesJsonStr);
             JSONArray resultsArray = moviesJson.getJSONArray(TMDB_RESULTS);
 
-            Model.clear();
 
-            MovieVO[] resultVOs = new MovieVO[resultsArray.length()];
+            ArrayList<Movie> results = new ArrayList<Movie>(resultsArray.length());
 
             for(int i = 0; i < resultsArray.length(); i++) {
 
@@ -212,26 +210,28 @@ public class PostersFragment extends Fragment {
                 String movieRating;
                 String movieReleaseDate;
 
-                JSONObject aMovie = resultsArray.getJSONObject(i);
+                JSONObject aJSONMovie = resultsArray.getJSONObject(i);
 
-                movieTitle = aMovie.getString(TMDB_TITLE);
-                moviePosterPath = aMovie.getString(TMDB_POSTER);
-                movieSynopsis = aMovie.getString(TMDB_SYNOPSIS);
-                movieRating = aMovie.getString(TMDB_RATING);
-                String releaseDate = aMovie.getString(TMDB_RELEASE_DATE);
+                movieTitle = aJSONMovie.getString(TMDB_TITLE);
+                moviePosterPath = aJSONMovie.getString(TMDB_POSTER);
+                movieSynopsis = aJSONMovie.getString(TMDB_SYNOPSIS);
+                movieRating = aJSONMovie.getString(TMDB_RATING);
+                String releaseDate = aJSONMovie.getString(TMDB_RELEASE_DATE);
 
                 movieReleaseDate = releaseDate == "null" ? "Unknown"
-                    : aMovie.getString(TMDB_RELEASE_DATE).substring(0,4);
+                    : aJSONMovie.getString(TMDB_RELEASE_DATE).substring(0,4);
 
-                MovieVO aMovieVO = new MovieVO(movieTitle, moviePosterPath, movieSynopsis,
-                        movieRating, movieReleaseDate);
+                Movie aMovie = new Movie();
+                aMovie.setMovieTitle(movieTitle);
+                aMovie.setMoviePosterPath(moviePosterPath);
+                aMovie.setMovieSynopsis(movieSynopsis);
+                aMovie.setMovieRating(movieRating);
+                aMovie.setMovieReleaseDate(movieReleaseDate);
 
-                resultVOs[i] = aMovieVO;
-                Model.addMovie(aMovieVO);
-
+                results.add(aMovie);
 
             }
-            return resultVOs;
+            return results;
 
         }
     }
