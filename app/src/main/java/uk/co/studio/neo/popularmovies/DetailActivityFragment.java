@@ -36,7 +36,10 @@ public class DetailActivityFragment extends Fragment {
         movieTitle.setText(movie.getMovieTitle());
 
         ImageView moviePoster = (ImageView)rootView.findViewById(R.id.movie_poster);
-        Picasso.with(getActivity()).load(movie.getMoviePosterCompleteURL()).into(moviePoster);
+        Picasso.with(getActivity()).load(movie.getMoviePosterCompleteURL())
+                .error(R.drawable.no_image)
+                .placeholder(R.drawable.placeholder)
+                .into(moviePoster);
 
         TextView movieYear = (TextView)rootView.findViewById(R.id.movie_release_year);
         movieYear.setText(movie.getmMovieReleaseDate());

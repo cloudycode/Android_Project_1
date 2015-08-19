@@ -199,7 +199,6 @@ public class PostersFragment extends Fragment {
             JSONObject moviesJson = new JSONObject(moviesJsonStr);
             JSONArray resultsArray = moviesJson.getJSONArray(TMDB_RESULTS);
 
-
             ArrayList<Movie> results = new ArrayList<Movie>(resultsArray.length());
 
             for(int i = 0; i < resultsArray.length(); i++) {
@@ -217,8 +216,7 @@ public class PostersFragment extends Fragment {
                 movieSynopsis = aJSONMovie.getString(TMDB_SYNOPSIS);
                 movieRating = aJSONMovie.getString(TMDB_RATING);
                 String releaseDate = aJSONMovie.getString(TMDB_RELEASE_DATE);
-
-                movieReleaseDate = releaseDate == "null" ? "Unknown"
+                movieReleaseDate = releaseDate.equals("null") ? "Unknown"
                     : aJSONMovie.getString(TMDB_RELEASE_DATE).substring(0,4);
 
                 Movie aMovie = new Movie();
