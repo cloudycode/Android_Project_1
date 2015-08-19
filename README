@@ -1,0 +1,12 @@
+This project use the API from https://www.themoviedb.org
+You will need to request an API Key from moviedb to run that code.
+
+To run the code create the following xml file
+/MyAndroidStudioProjectPath/PopularMovies/app/src/main/res/values/api_key.xml
+
+With the following content
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="api_key">MyApiKeyfromTheMovieDB</string>
+</resources>
+
