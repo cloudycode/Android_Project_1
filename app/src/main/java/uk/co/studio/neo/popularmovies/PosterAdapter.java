@@ -43,6 +43,7 @@ public class PosterAdapter extends ArrayAdapter<Movie>{
                 .load(url)
                 .error(R.drawable.no_image)
                 .placeholder(R.drawable.placeholder)
+                .fit()
                 .tag(context)
                 .into(holder.image);
 
