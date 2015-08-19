@@ -1,0 +1,89 @@
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="uk.co.studio.neo.popularmovies.DetailActivityFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            android:id="@+id/movie_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/material_deep_teal_500"
+            android:textColor="@color/abc_primary_text_material_dark"
+            android:textSize="@dimen/abc_text_size_display_1_material"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/textview_display_vertical_padding"
+            android:paddingBottom="@dimen/textview_display_vertical_padding"
+            android:layout_marginBottom="@dimen/space_between_content_areas"
+            />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:layout_marginBottom="@dimen/space_between_content_areas"
+            >
+
+            <ImageView
+                android:id="@+id/movie_poster"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/space_between_content_areas"
+                />
+
+            <TextView
+                android:id="@+id/movie_release_year"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/abc_text_size_headline_material"
+                android:layout_toRightOf="@id/movie_poster"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginBottom="@dimen/space_between_content_areas"
+                />
+
+            <TextView
+                android:id="@+id/movie_user_rating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/abc_text_size_caption_material"
+                android:layout_below="@id/movie_release_year"
+                android:layout_toRightOf="@id/movie_poster"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginBottom="@dimen/space_between_content_areas"
+                />
+
+            <!--TODO P2: Add button to add to favourites-->
+
+            <TextView
+                android:id="@+id/movie_synopsis"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/movie_poster"
+                android:layout_alignParentLeft="true"
+                android:layout_marginTop="@dimen/space_between_content_areas"
+                android:layout_marginBottom="@dimen/space_between_content_areas"
+                />
+
+        </RelativeLayout>
+
+        <View
+            android:layout_height="1dp"
+            android:layout_width="wrap_content"
+            android:background="@color/primary_dark_material_dark"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"/>
+
+        <!-- TODO P2: Add Trailers -->
+
+    </LinearLayout>
+
+</ScrollView>

@@ -1,8 +1,11 @@
 package uk.co.studio.neo.popularmovies;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,13 +26,19 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
+
+import uk.co.studio.neo.popularmovies.model.Model;
+import uk.co.studio.neo.popularmovies.model.MovieVO;
 
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class PostersFragment extends Fragment {
+
+    public final static String EXTRA_MESSAGE = "co.uk.studio.neo.popularmovies.MESSAGE";
+
+    private ArrayAdapter<String> mPosterAdapter;
 
     public PostersFragment() {
     }
@@ -41,44 +49,33 @@ public class PostersFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        String[] data = {
-                "Mad max",
-                "Jurassic world",
-                "Chappie",
-                "Interstellar",
-                "Jupiter",
-                "It follows",
-                "Inside Out"
-        };
-
-        ArrayList fakeData = new ArrayList<String>(Arrays.asList(data));
-
-        ArrayAdapter<String> posterAdapter = new ArrayAdapter<String>(
+        mPosterAdapter = new PosterAdapter(
                 getActivity(),
                 R.layout.grid_item_poster,
-                R.id.grid_item_poster_textview,
-                fakeData);
-
-
+                new ArrayList<String>());
 
         GridView gridview = (GridView) rootView.findViewById(R.id.gridview_posters);
-        gridview.setAdapter(posterAdapter);
+        gridview.setAdapter(mPosterAdapter);
 
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                Toast.makeText(getActivity(), "" + position,
-                        Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity(), DetailActivity.class)
+                        .putExtra(EXTRA_MESSAGE, position);
+                startActivity(intent);
             }
         });
-
 
         return rootView;
     }
 
     private void updateMovies(){
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String sort_option = prefs.getString(getString(R.string.sort_options_key),
+                getString(R.string.sort_default));
+
         FetchMoviesTask moviesTask = new FetchMoviesTask();
-        String sort_option = "popularity.desc";
         moviesTask.execute(sort_option);
     }
 
@@ -88,20 +85,20 @@ public class PostersFragment extends Fragment {
         super.onStart();
     }
 
-    public class FetchMoviesTask extends AsyncTask<String, Void, String[]> {
+    public class FetchMoviesTask extends AsyncTask<String, Void, MovieVO[]> {
 
         private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
 
         @Override
-        protected void onPostExecute(String[] results) {
-//            mForecastAdapter.clear();
-//            for (String dayForecastStr : results){
-//                mForecastAdapter.add(dayForecastStr);
-//            }
+        protected void onPostExecute(MovieVO[] results) {
+            mPosterAdapter.clear();
+            for (MovieVO movieVO : results){
+                mPosterAdapter.add(movieVO.getMoviePosterCompleteURL());
+            }
         }
 
         @Override
-        protected String[] doInBackground(String... params) {
+        protected MovieVO[] doInBackground(String... params) {
 
             if (params.length == 0) {
                 return null;
@@ -110,23 +107,14 @@ public class PostersFragment extends Fragment {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
 
-            // Will contain the raw JSON response as a string.
             String moviesJsonStr = null;
-
-
-            // Most popular URL
-            // https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=
-
-            // Highest rated URL
-            // https://api.themoviedb.org/3/discover/movie?sort_by=vote_average.desc&api_key=
 
             try {
                 // Construct the URL for the "The Movie Database" query
                 // Possible parameters are available at TMDb discovery's API page, at
                 // https://www.themoviedb.org/documentation/api/discover
 
-                // !!!!! TODO BLANK STRING BEFORE COMMIT
-                String myApiKey = "";
+                String myApiKey = getString(R.string.api_key);
 
                 final String FORECAST_BASE_URL = "https://api.themoviedb.org/3/discover/movie?";
                 final String SORT_PARAM = "sort_by";
@@ -148,7 +136,6 @@ public class PostersFragment extends Fragment {
                 InputStream inputStream = urlConnection.getInputStream();
                 StringBuffer buffer = new StringBuffer();
                 if (inputStream == null) {
-                    // Nothing to do.
                     return null;
                 }
                 reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -161,6 +148,8 @@ public class PostersFragment extends Fragment {
                     buffer.append(line + "\n");
                 }
 
+
+                inputStream.close();
                 if (buffer.length() == 0) {
                     // Stream was empty.  No point in parsing.
                     return null;
@@ -169,8 +158,6 @@ public class PostersFragment extends Fragment {
 
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
-                // If the code didn't successfully get the weather data, there's no point in attempting
-                // to parse it.
                 moviesJsonStr = null;
             } finally {
                 if (urlConnection != null) {
@@ -199,7 +186,7 @@ public class PostersFragment extends Fragment {
          * Take the String representing the complete movies list in JSON Format and
          * pull out the data we need to construct the Strings needed for the mockups.
          */
-        private String[] getMoviesDataFromJson(String moviesJsonStr)
+        private MovieVO[] getMoviesDataFromJson(String moviesJsonStr)
                 throws JSONException {
 
             // These are the names of the JSON objects that need to be extracted.
@@ -213,15 +200,16 @@ public class PostersFragment extends Fragment {
             JSONObject moviesJson = new JSONObject(moviesJsonStr);
             JSONArray resultsArray = moviesJson.getJSONArray(TMDB_RESULTS);
 
-            String[] resultStrs = new String[resultsArray.length()];
+            Model.clear();
+
+            MovieVO[] resultVOs = new MovieVO[resultsArray.length()];
 
             for(int i = 0; i < resultsArray.length(); i++) {
+
                 String movieTitle;
                 String moviePosterPath;
                 String movieSynopsis;
-                // TODO Make it a double
                 String movieRating;
-                // TODO Make it a date
                 String movieReleaseDate;
 
                 JSONObject aMovie = resultsArray.getJSONObject(i);
@@ -230,13 +218,20 @@ public class PostersFragment extends Fragment {
                 moviePosterPath = aMovie.getString(TMDB_POSTER);
                 movieSynopsis = aMovie.getString(TMDB_SYNOPSIS);
                 movieRating = aMovie.getString(TMDB_RATING);
-                movieReleaseDate = aMovie.getString(TMDB_RELEASE_DATE);
+                String releaseDate = aMovie.getString(TMDB_RELEASE_DATE);
 
-                resultStrs[i] = movieTitle + " - " + moviePosterPath
-                        + " - " + movieSynopsis + " - " + movieRating
-                        + " - " + movieReleaseDate;
+                movieReleaseDate = releaseDate == "null" ? "Unknown"
+                    : aMovie.getString(TMDB_RELEASE_DATE).substring(0,4);
+
+                MovieVO aMovieVO = new MovieVO(movieTitle, moviePosterPath, movieSynopsis,
+                        movieRating, movieReleaseDate);
+
+                resultVOs[i] = aMovieVO;
+                Model.addMovie(aMovieVO);
+
+
             }
-            return resultStrs;
+            return resultVOs;
 
         }
     }

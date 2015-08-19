@@ -8,10 +8,9 @@
         android:id="@+id/gridview_posters"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:columnWidth="@dimen/grid_column_width"
-        android:numColumns="auto_fit"
-        android:stretchMode="columnWidth"
-        android:gravity="center"
+        android:verticalSpacing="0dp"
+        android:horizontalSpacing="0dp"
+        android:numColumns="@integer/grid_num_column"
         />
 
 </FrameLayout>

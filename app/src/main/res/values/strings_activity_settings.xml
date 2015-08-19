@@ -1,0 +1,19 @@
+<resources>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+    <string name="sort_options_key">sortBy</string>
+    <string name="sort_default">popularity.desc</string>
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_sort_movies_label">Sort movies by</string>
+    <string-array name="pref_sort_movies_titles">
+        <item>Most popular</item>
+        <item>Highest rated</item>
+    </string-array>
+    <string-array name="pref_sort_movies_values">
+        <item>popularity.desc</item>
+        <item>vote_average.desc</item>
+    </string-array>
+
+</resources>
